@@ -18,22 +18,28 @@ RUN apt-get update && apt-get install -y \
     rpm \
     xdg-utils \
     git \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Install Rust
+# 2. Install mold Linker
+RUN wget -O- https://github.com/rui314/mold/releases/download/v2.40.4/mold-2.40.4-x86_64-linux.tar.gz | tar -C /usr/local --strip-components=1 --no-overwrite-dir -xzf - && \
+    ln -sf /usr/local/bin/mold /usr/bin/ld
+
+# 3. Install Rust
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal
 
-# 3. Install Node.js 24
+# 4. Install Node.js 24
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y nodejs && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# 4. Install pnpm
-RUN npm install -g pnpm
+# 5. Install pnpm
+RUN corepack enable pnpm
 
-# 5. Pre-create generic cache directories to ensure permissions
+# 6. Pre-create generic cache directories to ensure permissions
 RUN mkdir -p /github/home/.cargo && chmod 777 /github/home/.cargo
