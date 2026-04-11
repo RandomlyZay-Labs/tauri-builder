@@ -21,8 +21,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Install mold Linker
-RUN wget -O- https://github.com/rui314/mold/releases/download/v2.40.4/mold-2.40.4-x86_64-linux.tar.gz | tar -C /usr/local --strip-components=1 --no-overwrite-dir -xzf - && \
+# 2. Install mold Linker (Architecture-aware)
+RUN dpkgArch="$(dpkg --print-architecture)" && \
+    case "$dpkgArch" in \
+      amd64) MOLD_ARCH="x86_64-linux" ;; \
+      arm64) MOLD_ARCH="aarch64-linux" ;; \
+      *) echo "Unsupported architecture"; exit 1 ;; \
+    esac && \
+    wget -O- https://github.com/rui314/mold/releases/download/v2.40.4/mold-2.40.4-${MOLD_ARCH}.tar.gz | tar -C /usr/local --strip-components=1 --no-overwrite-dir -xzf - && \
     ln -sf /usr/local/bin/mold /usr/bin/ld
 
 # 3. Install Rust
