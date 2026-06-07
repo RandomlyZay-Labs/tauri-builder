@@ -1,5 +1,5 @@
 # Base image matches the GitHub Actions runner version for consistency
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -28,7 +28,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" && \
       arm64) MOLD_ARCH="aarch64-linux" ;; \
       *) echo "Unsupported architecture"; exit 1 ;; \
     esac && \
-    wget -O- https://github.com/rui314/mold/releases/download/v2.40.4/mold-2.40.4-${MOLD_ARCH}.tar.gz | tar -C /usr/local --strip-components=1 --no-overwrite-dir -xzf - && \
+    wget -O- https://github.com/rui314/mold/releases/download/v2.41.0/mold-2.41.0-${MOLD_ARCH}.tar.gz | tar -C /usr/local --strip-components=1 --no-overwrite-dir -xzf - && \
     ln -sf /usr/local/bin/mold /usr/bin/ld
 
 # 3. Install Rust
